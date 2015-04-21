@@ -292,6 +292,45 @@ public class SimpleGA {
         }
         pop = newPop;
     }
+	
+	public boolean distanceCheck(Individual first, Individual second, float threshhold) {
+		return threshhold >= hamming(first.sequence, second.sequence);
+	}
+	
+	/**
+	Threshhold Organizing
+	**/
+	public void threshhold(float threshholdSize) {
+		Collections.shuffle(Arrays.asList(pop));
+		Individual[] newPop = new Individual[popSize];
+		int j;
+		int chosen = 0;
+		for (int i = 0; i < popSize; i+=2) {
+			newPop[i] = new Individual(pop[i]);
+			for (j = i+1; j < popSize; j++) {
+				if (distanceCheck(newPop[i], pop[j], threshholdSize)) {
+					chosen = j;
+					break;
+				}
+			}
+			if (j == popSize) {
+				chosen = rgen.nextInt(popSize-1-i)+i+1;
+			}
+
+			newPop[i+1] = new Individual(pop[chosen]);
+			pop[chosen] = new Individual(pop[i+1]);
+		}
+		pop = newPop;
+	}
+	
+	/**
+	Restricted Mating
+	**/
+	public void restrictedMating(float threshholdSize) {
+		threshhold(threshholdSize);
+		crossoverUni();
+	}
+	
 
     /** 
      * Modify fitness in one or both of the following manners
