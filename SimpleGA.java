@@ -536,9 +536,16 @@ public class SimpleGA {
             // mutation
             SGA.mutateUniform();
 
-            // crossover
-            SGA.crossoverUni();
-            
+            // crossover        
+			if (!args[args.length-1].equals("-1")) {
+				try{
+					SGA.restrictedMating(Integer.parseInt(args[args.length-1]));
+				} catch (NumberFormatException e) {
+					System.out.println("Radius must be an integer");
+				}
+			} else {
+				SGA.crossoverUni();
+			}
         }
         
         // housekeeping for end of run
