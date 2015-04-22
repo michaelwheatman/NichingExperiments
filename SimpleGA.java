@@ -211,6 +211,9 @@ public class SimpleGA {
         child1.mutateUniform(mutRate);
         child2.mutateUniform(mutRate);
 
+        //TODO
+        // If statement don't do crossover if threshold < ham distance
+
         // uniform crossover
         for (int j=0; j<stringLength; j++) {
             if (rgen.nextDouble()<.5) {
