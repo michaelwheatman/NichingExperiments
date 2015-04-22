@@ -181,7 +181,7 @@ public class SimpleGA {
      * iff the child's fitness is greater than that most similar individual.  Otherwise
      * the child is discarded. Note that the chosen parents will always be in this sample.
      **/
-    public void crowdingTourn(int tSize, int sampleSize) {
+    public void crowdingTourn(int tSize, int sampleSize, int threshhold) {
         // shuffle enough population for both tournament and sample
         int numToShuffle = tSize;
         if (sampleSize>tSize) numToShuffle = sampleSize;
@@ -203,52 +203,52 @@ public class SimpleGA {
                 }
             }
         }
-        // start with children as copies of parents
-        Individual child1 = new Individual(pop[index]);
-        Individual child2 = new Individual(pop[secondIndex]);
+		
+		if (hamming(pop[index].sequence, pop[secondIndex].sequence) < threshhold || threshhold == -1) {
+			// start with children as copies of parents
+			Individual child1 = new Individual(pop[index]);
+			Individual child2 = new Individual(pop[secondIndex]);
 
-        // mutate 
-        child1.mutateUniform(mutRate);
-        child2.mutateUniform(mutRate);
+			// mutate 
+			child1.mutateUniform(mutRate);
+			child2.mutateUniform(mutRate);
 
-        //TODO
-        // If statement don't do crossover if threshold < ham distance
-
-        // uniform crossover
-        for (int j=0; j<stringLength; j++) {
-            if (rgen.nextDouble()<.5) {
-                char temp = child1.sequence[j];
-                child1.sequence[j] = child2.sequence[j];
-                child2.sequence[j] = temp;
-            }
-        }
-        // replace most similar individuals out of sample from population
-        int minDist1=-1, minDist2=-1, index1=0, index2=0;
-        for (int i=0; i<sampleSize; i++) {
-            int curDist1 = hamming(child1.sequence, pop[i].sequence);
-            int curDist2 = hamming(child2.sequence, pop[i].sequence);
-            if (i==0) {
-                minDist1 = curDist1;
-                minDist2 = curDist2;
-            }
-            else {
-                if (curDist1 < minDist1) {
-                    minDist1 = curDist1;
-                    index1 = i;
-                }
-                if (curDist2 < minDist2) {
-                    minDist2 = curDist2;
-                    index2 = i;
-                }
-            }
-        }
-        // only replace if new child has higher fitness than individual to be replaced
-        child1.evalMatch(goals);
-        child2.evalMatch(goals);
-        if (child1.fitness > pop[index1].fitness)
-            pop[index1] = child1;
-        if (child2.fitness > pop[index2].fitness)
-            pop[index2] = child2;
+			// uniform crossover
+			for (int j=0; j<stringLength; j++) {
+				if (rgen.nextDouble()<.5) {
+					char temp = child1.sequence[j];
+					child1.sequence[j] = child2.sequence[j];
+					child2.sequence[j] = temp;
+				}
+			}
+			// replace most similar individuals out of sample from population
+			int minDist1=-1, minDist2=-1, index1=0, index2=0;
+			for (int i=0; i<sampleSize; i++) {
+				int curDist1 = hamming(child1.sequence, pop[i].sequence);
+				int curDist2 = hamming(child2.sequence, pop[i].sequence);
+				if (i==0) {
+					minDist1 = curDist1;
+					minDist2 = curDist2;
+				}
+				else {
+					if (curDist1 < minDist1) {
+						minDist1 = curDist1;
+						index1 = i;
+					}
+					if (curDist2 < minDist2) {
+						minDist2 = curDist2;
+						index2 = i;
+					}
+				}
+			}
+			// only replace if new child has higher fitness than individual to be replaced
+			child1.evalMatch(goals);
+			child2.evalMatch(goals);
+			if (child1.fitness > pop[index1].fitness)
+				pop[index1] = child1;
+			if (child2.fitness > pop[index2].fitness)
+				pop[index2] = child2;
+		}
     }
 
     /** 
@@ -334,7 +334,6 @@ public class SimpleGA {
 		crossoverUni();
 	}
 	
-
     /** 
      * Modify fitness in one or both of the following manners
      * a scaling factor: if scale is valid (>1) fitness = scale^fitness
@@ -486,8 +485,8 @@ public class SimpleGA {
     }
      
     public static void main(String[] args) {
-        System.out.println("\nargs: pop size, selection type, selection modifiers");
-        System.out.println("selection types and modifiers:\n tournament selection: 't', tournament size\n fitness sharing: 'fs', scaling factor, niche radius\n crowding: 'c', tournament size, replacement sample size\n");
+//        System.out.println("\nargs: pop size, selection type, selection modifiers");
+//        System.out.println("selection types and modifiers:\n tournament selection: 't', tournament size\n fitness sharing: 'fs', scaling factor, niche radius\n crowding: 'c', tournament size, replacement sample size\n");
         
         int popSize = Integer.parseInt(args[0]);
         
@@ -527,7 +526,7 @@ public class SimpleGA {
             else if (args[1].equals("fs")) 
                 SGA.fitPropSelect(Double.parseDouble(args[2]), Integer.parseInt(args[3]));
             else if (args[1].equals("c")) {
-                SGA.crowdingTourn(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+                SGA.crowdingTourn(Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[args.length-1]));
                 // skip mutation and crossover below since was done as part of crowding
                 continue;
             }
@@ -552,13 +551,14 @@ public class SimpleGA {
         }
         
         // housekeeping for end of run
-        System.out.println("FINAL");
+//        System.out.println("FINAL");
         SGA.evaluateAll();
         int[] counts = SGA.sortPopulation();
-        SGA.printPopulation(); 
+//        SGA.printPopulation();
+		System.out.println(Arrays.toString(args));
         System.out.println("counts: "+Arrays.toString(counts));
         System.out.println("gens: "+gens);
-        System.out.println("first found a match at: "+firstFoundGens);
+        System.out.println("first found a match at: "+firstFoundGens + "\n");
     }
     
 }
