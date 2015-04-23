@@ -484,10 +484,12 @@ public class SimpleGA {
         return curCounts;
     }
      
-    public static void main(String[] args) {
+    public static void runWithParams(String[] args) {
 //        System.out.println("\nargs: pop size, selection type, selection modifiers");
 //        System.out.println("selection types and modifiers:\n tournament selection: 't', tournament size\n fitness sharing: 'fs', scaling factor, niche radius\n crowding: 'c', tournament size, replacement sample size\n");
         
+		
+		
         int popSize = Integer.parseInt(args[0]);
         
         // set # gens to run, if crowding each "gen" only produces 2 children, so equalize # fitness
@@ -555,10 +557,25 @@ public class SimpleGA {
         SGA.evaluateAll();
         int[] counts = SGA.sortPopulation();
 //        SGA.printPopulation();
-		System.out.println(Arrays.toString(args));
-        System.out.println("counts: "+Arrays.toString(counts));
-        System.out.println("gens: "+gens);
-        System.out.println("first found a match at: "+firstFoundGens + "\n");
+//		System.out.println(Arrays.toString(args) + ", counts: "+Arrays.toString(counts) + ", first found a match at: "+firstFoundGens + ".");
+		System.out.println(Arrays.toString(args) + ", first found a match at: "+firstFoundGens);
     }
+	
+	public static void main(String[] args) {
+		String[] t = new String[] {"2", "5", "7", "10", "15"};
+		String[] s = new String[] {"2", "4", "8", "16", "32", "64", "100"};
+		String[] params = new String[] {"100", "c", "", "", "-1"};
+		for (int i = 0; i < t.length; i++) {
+			for (int j = 0; j < s.length; j++) {
+				params[2] = t[i];
+				params[3] = s[j];
+				runWithParams(params);	
+			}
+			System.out.println("");
+		}
+		// {"100", "c", "2", "100", "-1"};
+		//String[] params = new String[] {"100", "c", "2", "100", "-1"};
+		//runWithParams(params);
+	}
     
 }
