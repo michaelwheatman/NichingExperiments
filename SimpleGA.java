@@ -2,6 +2,7 @@
  * GA to evolve matching strings.
  * Author: Sherri Goings
  * Last Modified: April, 2015
+ * Modified by Michael Wheatman and Sam Spaeth
  **/
 import java.util.*;
 
@@ -17,16 +18,19 @@ public class SimpleGA {
 
     // set of goal strings to match
     // currently Landscape A from the HW, assuming alphabetSize is set to 4
-    private final String[] goals = { "AAAAAAAAAAAAAAAA", "BBBBBBBBBBBBBBBB", 
-                                     "CCCCCCCCCCCCCCCC", "DDDDDDDDDDDDDDDD" };
+//    private final String[] goals = { "AAAAAAAAAAAAAAAA", "BBBBBBBBBBBBBBBB", 
+//                                     "CCCCCCCCCCCCCCCC", "DDDDDDDDDDDDDDDD" };
 
     // Landscape B from the HW, assuming alphabetSize of 3
-    //private final String[] goals = { "AAAAAAAAAAAAAAAA", "BBBBBBBBBBBBBBBB", "AAAAAAAAAAAAAAAA" }; 
-
+//    private final String[] goals = { "AAAAAAAAAAAAAAAA", "BBBBBBBBBBBBBBBB", "AAAAAAAAAAAAAAAA" }; 
+	
+	
+	// Landscape D
+	private final String[] goals = { "AAAAAAAAAAAAAAAA", "BBBBBBBBBBBBBBBB", "CCCCCCCCCCCCCCCC", "AAAAAAAAAADDDDDD" };
 
     // evolving strings can have letters from 'A' to '?' where alphabetSize determines
     // what ? is, more precisely '?' is alphabetSize letters after 'A' alphabetically
-    private final int alphabetSize = 4;
+  	private final int alphabetSize = 3;
 
     // remaining parameters depend on command line arguments
     private Individual[] pop;
@@ -264,6 +268,7 @@ public class SimpleGA {
      **/
     public void fitPropSelect(double scale, int nicheRadius) {
         Individual[] newPop = new Individual[popSize];
+		shufflePop(popSize);
 
         // get the sum of modified fitnesses to choose the correct space for 
         // stochastic uniform sampling
@@ -494,7 +499,7 @@ public class SimpleGA {
         
         // set # gens to run, if crowding each "gen" only produces 2 children, so equalize # fitness
         // evals by multiplying # gens by 1/2 pop size
-        int nGens = 1000;
+        int nGens = 2000;
         if (args[1].equals("c")) {
             nGens = nGens * popSize/2;
         }
@@ -502,7 +507,7 @@ public class SimpleGA {
         SimpleGA SGA = new SimpleGA(popSize);
         boolean foundAMatch = false;
         int firstFoundGens = -1;
-        int maxPossFit = 8;
+        int maxPossFit = 16;
 
         // initialization
         SGA.initPopulation();
@@ -558,20 +563,26 @@ public class SimpleGA {
         int[] counts = SGA.sortPopulation();
 //        SGA.printPopulation();
 //		System.out.println(Arrays.toString(args) + ", counts: "+Arrays.toString(counts) + ", first found a match at: "+firstFoundGens + ".");
-		System.out.println(Arrays.toString(args) + ", first found a match at: "+firstFoundGens);
+		System.out.println(Arrays.toString(args) + ", counts: "+Arrays.toString(counts));
     }
 	
 	public static void main(String[] args) {
-		String[] t = new String[] {"2", "5", "7", "10", "15"};
-		String[] s = new String[] {"2", "4", "8", "16", "32", "64", "100"};
-		String[] params = new String[] {"100", "c", "", "", "-1"};
-		for (int i = 0; i < t.length; i++) {
-			for (int j = 0; j < s.length; j++) {
-				params[2] = t[i];
-				params[3] = s[j];
-				runWithParams(params);	
+		if (args.length == 0) {
+			String[] t = new String[] {"1.3", "1.4", "1.5"};
+			String[] s = new String[] {"8", "9", "10", "11"};
+			
+			String[] params = new String[] {"200", "fs", "", "", "-1"};
+			for (int i = 0; i < t.length; i++) {
+				for (int j = 0; j < s.length; j++) {
+					params[2] = t[i];
+					params[3] = s[j];
+					runWithParams(params);	
+				}
+				System.out.println("");
 			}
-			System.out.println("");
+		}
+		else {
+			runWithParams(args);
 		}
 		// {"100", "c", "2", "100", "-1"};
 		//String[] params = new String[] {"100", "c", "2", "100", "-1"};
